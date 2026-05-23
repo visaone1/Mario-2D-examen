@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/* Activate sprite renderer/box collider if bumped by Player's head
- * Applicable to: Hidden collectible blocks
- */
+
 
 public class VisibleUponHit : MonoBehaviour {
 	private SpriteRenderer m_SpriteRenderer;

@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/* Move vertically and continuously between 2 stop points
- * Applicable to: Piranha, Vertical Moving Platform Struct
- */
 
 public class PatrolVertical : MonoBehaviour {
 	public Transform UpStop;

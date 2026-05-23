@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/* Move horizontally and continuously between 2 stop points
- * Applicable to: Horizontal Moving Platform Struct
- */
-
 
 public class PatrolHorizontal : MonoBehaviour {
 	public Transform LeftStop;

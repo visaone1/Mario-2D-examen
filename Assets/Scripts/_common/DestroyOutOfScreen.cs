@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/* Destroy if object goes out of screen
- * Applicable to: Vertical Moving Platform for Spawner, Mario Fireball
- */
 
 public class DestroyOutOfScreen : MonoBehaviour {
 

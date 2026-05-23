@@ -33,7 +33,7 @@ public class MoveAndFlip : MonoBehaviour {
 //		}
 //	}
 
-	// Assuming default sprites face right
+	
 	void OrientSprite() {
 		if (directionX > 0) {
 			transform.localScale = new Vector3 (1, 1, 1);

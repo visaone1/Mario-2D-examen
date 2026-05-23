@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-/* Automatically delete game object after animation finishes
- * Applicable to: Block Coin, Floating Text Effect
- */
-
-
 public class DestroyAfterAnimation : MonoBehaviour {
 	public float delay = 0f; // optional delay
 

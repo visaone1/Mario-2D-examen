@@ -1,11 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-/* Powerup collectible behaviors
- * Applicable to: Big Mushroom, Fireflower
- */
-
 public class PowerupObject : MonoBehaviour {
 	private LevelManager t_LevelManager;
 	private Rigidbody2D m_Rigidbody2D;

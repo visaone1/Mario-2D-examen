@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/* Applicable to: Goomba, Koopa, Koopa Shell, Koopa Winged, Piranha, Firebar, Bowser Fire, Bowser
- */
-
 public class Enemy : MonoBehaviour {
 	public Vector2 flippedVelocity = new Vector2(0, 3);
 	public int starmanBonus;

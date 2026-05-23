@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-/* Spawn object if bumped by Player's head
- * Applicable to: Collectible brick and question blocks
- */
-
 public class CollectibleBlock : MonoBehaviour {
 	private Animator m_Animator;
 	private LevelManager t_LevelManager;

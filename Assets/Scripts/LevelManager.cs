@@ -430,28 +430,40 @@ void RetrieveGameState() {
 			+ t_GameStateManager.spawnFromPoint.ToString () + ", spawnPipeIdx=" 
 			+ t_GameStateManager.spawnPipeIdx.ToString ());
 	}
+public void ReloadCurrentLevel(float delay = loadSceneDelay, bool timeup = false) {
+        // --- ESCUDO DE SEGURIDAD: MODO PRUEBA ---
+        if (t_GameStateManager != null) {
+            t_GameStateManager.SaveGameState ();
+            t_GameStateManager.ConfigReplayedLevel ();
+            t_GameStateManager.sceneToLoad = UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name;
+        } else {
+            Debug.LogWarning("Modo prueba: Omitiendo guardado de estado al recargar el nivel.");
+        }
+        // ----------------------------------------
 
-	public void ReloadCurrentLevel(float delay = loadSceneDelay, bool timeup = false) {
-		t_GameStateManager.SaveGameState ();
-		t_GameStateManager.ConfigReplayedLevel ();
-		t_GameStateManager.sceneToLoad = SceneManager.GetActiveScene ().name;
-		if (timeup) {
-			LoadSceneDelay ("Time Up Screen", delay);
-		} else {
-			LoadSceneDelay ("Level Start Screen", delay);
-		}
-	}
+        if (timeup) {
+            LoadSceneDelay ("Time Up Screen", delay);
+        } else {
+            LoadSceneDelay ("Level Start Screen", delay);
+        }
+    }
 
-	public void LoadGameOver(float delay = loadSceneDelay, bool timeup = false) {
-		int currentHighScore = PlayerPrefs.GetInt ("highScore", 0);
-		if (scores > currentHighScore) {
-			PlayerPrefs.SetInt ("highScore", scores);
-		}
-		t_GameStateManager.timeup = timeup;
-		LoadSceneDelay ("Game Over Screen", delay);
-	}
-
-
+    public void LoadGameOver(float delay = loadSceneDelay, bool timeup = false) {
+        int currentHighScore = PlayerPrefs.GetInt ("highScore", 0);
+        if (scores > currentHighScore) {
+            PlayerPrefs.SetInt ("highScore", scores);
+        }
+        
+        // --- ESCUDO DE SEGURIDAD: MODO PRUEBA ---
+        if (t_GameStateManager != null) {
+            t_GameStateManager.timeup = timeup;
+        } else {
+            Debug.LogWarning("Modo prueba: Omitiendo variable timeup para Game Over.");
+        }
+        // ----------------------------------------
+        
+        LoadSceneDelay ("Game Over Screen", delay);
+    }
 	/****************** HUD and sound effects */
 	public void SetHudCoin() {
 		coinText.text = "x" + coins.ToString ("D2");
@@ -564,22 +576,31 @@ void RetrieveGameState() {
 		}
 	}
 
+/****************** Misc */
+    public Vector3 FindSpawnPosition() {
+        Vector3 spawnPosition;
+        GameStateManager t_GameStateManager = FindObjectOfType<GameStateManager>();
 
-	/****************** Misc */
-	public Vector3 FindSpawnPosition() {
-		Vector3 spawnPosition;
-		GameStateManager t_GameStateManager = FindObjectOfType<GameStateManager>();
-		Debug.Log (this.name + " FindSpawnPosition: GSM spawnFromPoint=" + t_GameStateManager.spawnFromPoint.ToString()
-			+ " spawnPipeIdx= " + t_GameStateManager.spawnPipeIdx.ToString() 
-			+ " spawnPointIdx=" + t_GameStateManager.spawnPointIdx.ToString());
-		if (t_GameStateManager.spawnFromPoint) {
-			spawnPosition = GameObject.Find ("Spawn Points").transform.GetChild (t_GameStateManager.spawnPointIdx).transform.position;
-		} else {
-			spawnPosition = GameObject.Find ("Spawn Pipes").transform.GetChild (t_GameStateManager.spawnPipeIdx).transform.Find("Spawn Pos").transform.position;
-		}
-		return spawnPosition;
-	}
+        // --- ESCUDO DE SEGURIDAD PARA MODO PRUEBA ---
+        if (t_GameStateManager == null) {
+            // Si iniciamos directo en el nivel, fuerza la aparición en el primer Spawn Point
+            Debug.LogWarning("Modo prueba: No se encontró GameStateManager. Asignando Spawn Point por defecto.");
+            return GameObject.Find("Spawn Points").transform.GetChild(0).position;
+        }
+        // --------------------------------------------
 
+        Debug.Log (this.name + " FindSpawnPosition: GSM spawnFromPoint=" + t_GameStateManager.spawnFromPoint.ToString()
+            + " spawnPipeIdx= " + t_GameStateManager.spawnPipeIdx.ToString() 
+            + " spawnPointIdx=" + t_GameStateManager.spawnPointIdx.ToString());
+            
+        if (t_GameStateManager.spawnFromPoint) {
+            spawnPosition = GameObject.Find ("Spawn Points").transform.GetChild (t_GameStateManager.spawnPointIdx).position;
+        } else {
+            spawnPosition = GameObject.Find ("Spawn Pipes").transform.GetChild (t_GameStateManager.spawnPipeIdx).Find("Spawn Pos").position;
+        }
+        
+        return spawnPosition;
+    }
 	public string GetWorldName(string sceneName) {
 		string[] sceneNameParts = Regex.Split (sceneName, " - ");
 		return sceneNameParts[0];

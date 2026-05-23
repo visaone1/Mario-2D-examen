@@ -3,54 +3,66 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PipeWarpUp : MonoBehaviour {
-	private Mario mario;
-	private Transform stop;
+    private Mario mario;
+    private Transform stop;
 
-	private float platformVelocityY = .05f;
-	public bool isTakingMarioUp;
+    private float platformVelocityY = .05f;
+    public bool isTakingMarioUp;
 
-	private LevelManager t_LevelManager;
+    private LevelManager t_LevelManager;
 
-	public bool resetSpawnPoint = false;
+    public bool resetSpawnPoint = false;
 
-	void Start () {
-		mario = FindObjectOfType<Mario> ();
-		stop = transform.parent.transform.Find ("Platform Stop");
-		GameStateManager t_GameStateManager = FindObjectOfType<GameStateManager> ();
-		t_LevelManager = FindObjectOfType<LevelManager> ();
+    void Start () {
+        mario = FindObjectOfType<Mario> ();
+        stop = transform.parent.transform.Find ("Platform Stop");
+        GameStateManager t_GameStateManager = FindObjectOfType<GameStateManager> ();
+        t_LevelManager = FindObjectOfType<LevelManager> ();
 
-		Debug.Log (this.name + " Start: " + transform.parent.gameObject.name 
-			+ " spawnFromPoint=" + t_GameStateManager.spawnFromPoint.ToString()
-			+ " with idx=" + t_GameStateManager.spawnPipeIdx.ToString());
+        // --- ESCUDO DE SEGURIDAD: MODO PRUEBA ---
+        if (t_GameStateManager == null) {
+            isTakingMarioUp = false;
+            transform.position = stop.position;
+            Debug.LogWarning("Modo prueba: GameStateManager no encontrado. Tubería inactiva al inicio.");
+            return; // Salimos de la función aquí para evitar colapsos
+        }
+        // ----------------------------------------
 
-		if (!t_GameStateManager.spawnFromPoint && t_GameStateManager.spawnPipeIdx == transform.parent.GetSiblingIndex ()) {
-			isTakingMarioUp = true;
-			mario.FreezeUserInput ();
-			t_LevelManager.timerPaused = true;
-			Debug.Log (this.name + " Start: " + transform.parent.gameObject.name + " taking Mario up");
-		} else {
-			isTakingMarioUp = false;
-			transform.position = stop.position;
-			Debug.Log (this.name + " Start: " + transform.parent.gameObject.name + " not taking Mario up");
-		}
+        Debug.Log (this.name + " Start: " + transform.parent.gameObject.name 
+            + " spawnFromPoint=" + t_GameStateManager.spawnFromPoint.ToString()
+            + " with idx=" + t_GameStateManager.spawnPipeIdx.ToString());
 
-	}
+        if (!t_GameStateManager.spawnFromPoint && t_GameStateManager.spawnPipeIdx == transform.parent.GetSiblingIndex ()) {
+            isTakingMarioUp = true;
+            if (mario != null) mario.FreezeUserInput ();
+            if (t_LevelManager != null) t_LevelManager.timerPaused = true;
+            Debug.Log (this.name + " Start: " + transform.parent.gameObject.name + " taking Mario up");
+        } else {
+            isTakingMarioUp = false;
+            transform.position = stop.position;
+            Debug.Log (this.name + " Start: " + transform.parent.gameObject.name + " not taking Mario up");
+        }
+    }
 
-	void FixedUpdate() {
-		if (isTakingMarioUp) {
-			if (transform.position.y < stop.position.y) {
-				transform.position = new Vector2 (transform.position.x, transform.position.y + platformVelocityY);
-			} else if (t_LevelManager.timerPaused) {
-				GameStateManager t_GameStateManager = FindObjectOfType<GameStateManager> ();
-				t_GameStateManager.spawnFromPoint = true;
-				if (resetSpawnPoint) {
-					t_GameStateManager.ResetSpawnPosition ();
-				}
-				mario.UnfreezeUserInput ();
-				t_LevelManager.timerPaused = false;
-				isTakingMarioUp = false;
-			}		
-		}
-	}
-		
+    void FixedUpdate() {
+        if (isTakingMarioUp) {
+            if (transform.position.y < stop.position.y) {
+                transform.position = new Vector2 (transform.position.x, transform.position.y + platformVelocityY);
+            } else if (t_LevelManager != null && t_LevelManager.timerPaused) {
+                GameStateManager t_GameStateManager = FindObjectOfType<GameStateManager> ();
+                
+                // --- SEGUNDO ESCUDO PARA LA ACTUALIZACIÓN ---
+                if (t_GameStateManager != null) {
+                    t_GameStateManager.spawnFromPoint = true;
+                    if (resetSpawnPoint) {
+                        t_GameStateManager.ResetSpawnPosition ();
+                    }
+                }
+                
+                if (mario != null) mario.UnfreezeUserInput ();
+                t_LevelManager.timerPaused = false;
+                isTakingMarioUp = false;
+            }       
+        }
+    }
 }
